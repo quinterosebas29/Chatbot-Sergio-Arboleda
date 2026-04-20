@@ -316,7 +316,10 @@
   overflow-x: auto;
   flex-shrink: 0;
   scrollbar-width: none;
+  cursor: grab;
+  -webkit-overflow-scrolling: touch;
 }
+#chatbot-topics:active { cursor: grabbing; }
 #chatbot-topics::-webkit-scrollbar { display: none; }
 
 .topic-chip {
@@ -332,6 +335,7 @@
   font-family: var(--chat-font);
   transition: all 0.15s ease;
   white-space: nowrap;
+  pointer-events: all;
 }
 
 .topic-chip:hover {
@@ -889,5 +893,350 @@
 #demo-send .material-symbols-outlined {
   font-size: 16px !important;
   color: #fff;
+}
+
+/* ── Demo attach / audio icon buttons ──────────────────────── */
+.demo-icon-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: #525252;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.demo-icon-btn:hover {
+  background: var(--ibm-gray-10);
+  color: var(--ibm-blue-60);
+}
+.demo-icon-btn .material-symbols-outlined {
+  font-size: 20px !important;
+  pointer-events: none;
+}
+
+/* Mic button — recording state (red pulsing) */
+.demo-icon-btn.recording {
+  color: #da1e28;
+  background: #fff0f0;
+  animation: mic-pulse 1.2s ease-in-out infinite;
+}
+.demo-icon-btn.recording:hover { background: #ffe0e0; }
+
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(218, 30, 40, 0.3); }
+  50%       { box-shadow: 0 0 0 6px rgba(218, 30, 40, 0); }
+}
+
+/* ── Recording bar (shown inside demo-input-area while recording) */
+#demo-recording-bar {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  padding: 4px 8px;
+  background: #fff0f0;
+  border-radius: 6px;
+  border: 1px solid #ffd7d9;
+  min-width: 0;
+}
+
+.rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #da1e28;
+  flex-shrink: 0;
+  animation: rec-blink 1s step-start infinite;
+}
+@keyframes rec-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+#rec-timer {
+  font-size: 13px;
+  font-weight: 600;
+  color: #da1e28;
+  font-family: 'IBM Plex Mono', monospace;
+  flex-shrink: 0;
+}
+
+.rec-label {
+  font-size: 11px;
+  color: #a2191f;
+  font-family: var(--chat-font);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Demo file preview bubble ──────────────────────────────── */
+.demo-file-preview,
+.demo-audio-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 0 4px;
+}
+.demo-file-icon,
+.demo-audio-icon {
+  font-size: 28px !important;
+  color: var(--ibm-blue-60);
+  flex-shrink: 0;
+}
+.demo-audio-icon { color: #6929c4; }
+.demo-file-info,
+.demo-audio-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.demo-file-name,
+.demo-audio-name {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+  display: block;
+  color: var(--ibm-white);
+}
+.demo-file-size,
+.demo-audio-size {
+  font-size: 10px;
+  color: rgba(255,255,255,0.7);
+  display: block;
+}
+.msg-file-bubble,
+.msg-audio-bubble {
+  background: var(--ibm-blue-60) !important;
+  color: var(--ibm-white);
+  border-radius: 12px 12px 0 12px;
+  max-width: 80%;
+}
+.msg-file-bubble .msg-time,
+.msg-audio-bubble .msg-time {
+  color: rgba(255,255,255,0.6);
+}
+
+/* ── Recorded audio bubble (real recording with player) ──────── */
+.demo-audio-recorded {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 2px 0 4px;
+}
+
+.demo-audio-recorded .demo-audio-icon {
+  font-size: 24px !important;
+  color: rgba(255,255,255,0.9);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.demo-audio-player-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+/* Compact audio player inside bubble */
+.demo-audio-player-wrap audio {
+  width: 100%;
+  min-width: 180px;
+  max-width: 220px;
+  height: 32px;
+  border-radius: 4px;
+  /* browsers render their own controls — keep it simple */
+  filter: invert(1) hue-rotate(180deg) brightness(0.95);
+  opacity: 0.92;
+}
+
+.demo-audio-meta {
+  font-size: 10px;
+  color: rgba(255,255,255,0.65);
+  font-family: 'IBM Plex Mono', monospace;
+  display: block;
+}
+
+/* ── Queue View ─────────────────────────────────────────────── */
+#chatbot-queue-view {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+#chatbot-header-queue {
+  background: var(--ibm-blue-70);
+}
+
+#queue-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  gap: 12px;
+  text-align: center;
+  background: var(--ibm-white);
+}
+
+/* Spinning orbit animation */
+#queue-spinner {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 4px;
+}
+
+.queue-orbit {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px dashed rgba(0, 67, 139, 0.25);
+  animation: queue-spin 3s linear infinite;
+}
+
+.queue-dot-outer {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ibm-blue-60);
+  box-shadow: 0 0 8px rgba(0,67,139,0.5);
+}
+
+.queue-icon-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px !important;
+  color: var(--ibm-blue-60);
+}
+
+@keyframes queue-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+#queue-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ibm-gray-90);
+  margin: 0;
+  font-family: var(--chat-font);
+}
+
+#queue-subtitle {
+  font-size: 12px;
+  color: #525252;
+  margin: 0 0 4px;
+  font-family: var(--chat-font);
+  line-height: 1.5;
+}
+
+#queue-status-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--ibm-gray-10);
+  border: 1px solid var(--ibm-gray-20);
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 240px;
+}
+
+.queue-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  gap: 2px;
+}
+
+.queue-stat span:first-child {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ibm-blue-60);
+  font-family: 'IBM Plex Mono', monospace;
+  line-height: 1.1;
+}
+
+.queue-stat small {
+  font-size: 10px;
+  color: #6f6f6f;
+  font-family: var(--chat-font);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.queue-divider-v {
+  width: 1px;
+  height: 40px;
+  background: var(--ibm-gray-20);
+  flex-shrink: 0;
+}
+
+#queue-progress-bar {
+  width: 100%;
+  max-width: 260px;
+  height: 4px;
+  background: var(--ibm-gray-20);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+#queue-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--ibm-blue-60), #42be65);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+#queue-tips-text {
+  font-size: 11.5px;
+  color: #6f6f6f;
+  margin: 4px 0 0;
+  font-family: var(--chat-font);
+  line-height: 1.5;
+  max-width: 260px;
+  transition: opacity 0.4s ease;
+}
+
+#chatbot-footer-queue {
+  text-align: center;
+  padding: 6px 0 8px;
+  font-size: 10px;
+  color: #8d8d8d;
+  font-family: var(--chat-font);
+  background: var(--ibm-white);
+  border-top: 1px solid var(--ibm-gray-20);
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+
+#chatbot-footer-queue a {
+  color: var(--ibm-blue-60);
+  text-decoration: none;
+  font-weight: 500;
 }
 

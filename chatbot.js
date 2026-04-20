@@ -33,12 +33,8 @@
       response: '📄 Los **documentos generales** para admisión son:\n\n• Fotocopia del documento de identidad\n• Diploma o acta de grado bachillerato\n• Resultado de las Pruebas Saber 11°\n• Formulario de inscripción diligenciado\n• Foto tamaño documento\n\n*Los requisitos pueden variar según el programa.*',
       replies: ['Ver admisiones', 'Costos de matrícula', 'Contacto']
     },
-
-    /* ── Costos específicos por programa ───────────────────── */
     {
-      patterns: [
-        'precio diseño', 'costo diseño', 'valor diseño', 'costo de diseño', 'precio de diseño', 'valor de diseño', 'valor del diseño', 'cuánto vale diseño', 'cuanto vale diseño', 'cuánto cuesta diseño', 'cuanto cuesta diseño', 'diseño digital precio', 'diseño digital costo', 'diseño digital valor', 'diseño digital cuánto'
-      ],
+      patterns: ['precio diseño', 'costo diseño', 'valor diseño', 'costo de diseño', 'precio de diseño', 'valor de diseño', 'valor del diseño', 'cuánto vale diseño', 'cuanto vale diseño', 'cuánto cuesta diseño', 'cuanto cuesta diseño', 'diseño digital precio', 'diseño digital costo', 'diseño digital valor', 'diseño digital cuánto'],
       response: '🎨 El **valor de la matrícula** para **Diseño Digital** oscila entre **$5.7M y $6.5M** para el período 2025-2.\n\n• Contamos con opciones de financiación y becas por mérito con resultados Saber 11.\n• Programa innovador con enfoque global.',
       replies: ['Descuentos disponibles', 'Opciones de financiación', 'Hablar con un asesor']
     },
@@ -72,21 +68,16 @@
       response: '📊 El **valor de la matrícula** para programas de Finanzas, Contaduría y Marketing está entre **$5.8M y $6.8M** (referencia 2025-2).\n\nEnfoque en casos reales y bolsa de valores digital.',
       replies: ['Descuentos disponibles', 'Hablar con un asesor']
     },
-
-    /* ── Costo Genérico (Fallback) ─────────────────────────── */
     {
       patterns: ['costo', 'valor', 'precio', 'matrícula', 'cuanto cuesta', 'cuánto vale', 'precio carrera', 'valor carrera'],
       response: '💰 Los **valores de matrícula** varían según el programa.\nPor ejemplo, van desde $5.7M (Diseño Digital) hasta opciones alrededor de $9.5M (Derecho).\n\n¿Qué carrera específica te gustaría cotizar?',
       replies: ['Precio Diseño Digital', 'Precio Derecho', 'Descuentos disponibles']
     },
-
-    /* ── Descuentos ────────────────────────────────────────── */
     {
       patterns: ['descuento', 'beca', 'beneficio', 'financiación', 'financiacion', 'icetex', 'crédito', 'credito'],
       response: '🌟 **Beneficios económicos disponibles:**\n\n• **Descuento por mérito:** Según resultados Saber 11\n• **Convenio empresarial:** Trabajadores de empresas aliadas\n• **Hermanos sergistas:** Si un familiar ya estudia aquí\n• **ICETEX:** Financiación a largo plazo\n• **Banco Sergio:** Crédito interno 0% de interés\n\n📞 Asesoría personalizada: (605) 434 6444',
       replies: ['Hablar con un asesor']
     },
-
     {
       patterns: ['horario de atención', 'horario de atencion', 'cuándo abren', 'cuando abren', 'a qué hora abren'],
       response: '🕒 El **horario de atención** del campus es:\n\n**Lunes a Viernes:**\n8:00 a.m. - 12:00 m. y 2:00 p.m. - 6:00 p.m.\n\n**Sábados:**\n8:00 a.m. - 12:00 m.\n\nTambién contamos con atención virtual en las mismas franjas. ¿Necesitas nuestra dirección?',
@@ -159,9 +150,19 @@
     }
   ];
 
+  /* ── AI-style dynamic responses for the bot ──────────────── */
+  const AI_FALLBACKS = [
+    (q) => `Entiendo tu consulta sobre "${q.slice(0,40)}...". En la Universidad Sergio Arboleda Santa Marta tenemos varias opciones que pueden ayudarte. ¿Podrías contarme un poco más sobre lo que buscas? 😊`,
+    (q) => `Gracias por tu mensaje. Para orientarte mejor sobre **"${q.slice(0,35)}..."**, nuestros asesores están disponibles ahora mismo. ¿Prefieres continuar aquí o hablar con alguien en persona?`,
+    (q) => `¡Buena pregunta! La **Universidad Sergio Arboleda** ofrece múltiples recursos para ese tema. ¿Quieres que te conecte con un asesor especializado o prefieres explorar más opciones aquí?`,
+    () => `Estoy procesando tu consulta... 🤔 Mientras tanto, ¿sabías que tenemos **más de 20 programas** académicos? Puedo guiarte al que mejor se adapte a tu perfil.`,
+    () => `Entendido. Para darte información precisa sobre eso, lo mejor es hablar con uno de nuestros **asesores académicos** que están en línea ahora. ¿Te conecto?`,
+    (q) => `He registrado tu consulta sobre "${q.slice(0,30)}...". En la **Sergio Santa Marta** siempre buscamos orientarte de la mejor forma. ¿Tienes alguna preferencia de programa o área de estudio?`,
+  ];
+
   /* ── Configuración ───────────────────────────────────────── */
   const DEFAULT_RESPONSE = {
-    text: 'Hmm, no estoy seguro de cómo ayudarte con eso 🤔 Puedo orientarte sobre precios, admisiones, admisiones, o te puedo enlazar con un asesor.',
+    text: 'Hmm, no estoy seguro de cómo ayudarte con eso 🤔 Puedo orientarte sobre precios, admisiones, o te puedo enlazar con un asesor.',
     replies: ['Precios', 'Admisiones', 'Hablar con un asesor']
   };
 
@@ -178,7 +179,7 @@
 
   function findAnswer(input) {
     const norm = normalize(input);
-    
+
     // 1st pass: exact pattern matching
     for (const entry of KB) {
       for (const pattern of entry.patterns) {
@@ -192,7 +193,7 @@
     const priceIntent = /precio|costo|valor|cuanto|cuánto|cuesta|vale/.test(norm);
     if (priceIntent) {
       const programMap = [
-        { keywords: ['diseno', 'diseño'], idx: 6 }, // Diseño is at KB index 6
+        { keywords: ['diseno', 'diseño'], idx: 6 },
         { keywords: ['derecho'], idx: 7 },
         { keywords: ['administracion', 'administración'], idx: 8 },
         { keywords: ['psicolog'], idx: 9 },
@@ -209,11 +210,19 @@
       }
     }
 
-    return { text: DEFAULT_RESPONSE.text, replies: DEFAULT_RESPONSE.replies };
+    // 3rd pass: AI-style dynamic fallback for realism
+    const aiReply = AI_FALLBACKS[Math.floor(Math.random() * AI_FALLBACKS.length)](input);
+    return { text: aiReply, replies: ['Ver programas', 'Costos de matrícula', 'Hablar con un asesor'] };
   }
 
   function formatText(text) {
     return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   }
 
   /* ── DOM Injection ──────────────────────────────────────────── */
@@ -405,6 +414,53 @@
           </div>
         </div>
 
+        <!-- ── QUEUE VIEW (Cola de espera) ──────────────────── -->
+        <div id="chatbot-queue-view" style="display:none; flex-direction:column; height:100%;">
+          <div id="chatbot-header-queue" class="ibm-header" style="display:flex; align-items:center; padding:12px 16px; color:#fff;">
+            <button id="queue-back-btn" class="chat-header-btn" aria-label="Volver">
+              <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            </button>
+            <div class="chat-avatar agent-initials" style="margin-left:8px;">JC</div>
+            <div class="chat-header-info" style="margin-left:10px; flex:1;">
+              <p class="chat-header-name" style="margin:0; font-size:14px; font-weight:600;">Juan Carlos R.</p>
+              <p class="chat-header-status" style="margin:0; font-size:11px;"><span class="status-dot online"></span> Asesor disponible</p>
+            </div>
+            <div class="chat-header-actions">
+              <button class="chat-header-btn" id="queue-minimize-btn" aria-label="Minimizar">
+                <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div id="queue-body">
+            <div id="queue-spinner">
+              <div class="queue-orbit">
+                <div class="queue-dot-outer"></div>
+              </div>
+              <span class="material-symbols-outlined queue-icon-center">support_agent</span>
+            </div>
+            <p id="queue-title">Conectando con un asesor&hellip;</p>
+            <p id="queue-subtitle">Por favor espera, estamos buscando al asesor más adecuado para ti.</p>
+            <div id="queue-status-row">
+              <div class="queue-stat">
+                <span id="queue-position">3</span>
+                <small>Posición en cola</small>
+              </div>
+              <div class="queue-divider-v"></div>
+              <div class="queue-stat">
+                <span id="queue-wait">~2 min</span>
+                <small>Tiempo estimado</small>
+              </div>
+            </div>
+            <div id="queue-progress-bar"><div id="queue-progress-fill"></div></div>
+            <p id="queue-tips-text">💡 Mientras esperas, ¿sabías que puedes consultar tu horario en el <strong>Sistema Sapio</strong>?</p>
+          </div>
+
+          <div id="chatbot-footer-queue">
+            Cola de atenci&oacute;n &middot; <a href="https://www.usergioarboleda.edu.co/santamarta/" target="_blank">Universidad Sergio Arboleda</a>
+          </div>
+        </div>
+
         <!-- ── DEMO LIVE AGENT VIEW ─────────────────────────── -->
         <div id="chatbot-demo-view" style="display:none; flex-direction:column; height:100%;">
           <div id="chatbot-header-demo" class="ibm-header" style="display:flex; align-items:center; padding:12px 16px; color:#fff;">
@@ -430,7 +486,22 @@
 
           <div id="demo-messages" aria-live="polite"></div>
 
+          <!-- Hidden file input -->
+          <input type="file" id="demo-file-input" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" style="display:none;">
+          <!-- Recording indicator (hidden by default) -->
+          <div id="demo-recording-bar" style="display:none;">
+            <span class="rec-dot"></span>
+            <span id="rec-timer">0:00</span>
+            <span class="rec-label">Grabando&hellip; Toca el mic para detener</span>
+          </div>
+
           <div id="demo-input-area">
+            <button id="demo-attach-btn" class="demo-icon-btn" aria-label="Adjuntar archivo" title="Adjuntar archivo">
+              <span class="material-symbols-outlined">attach_file</span>
+            </button>
+            <button id="demo-audio-btn" class="demo-icon-btn" aria-label="Enviar audio" title="Enviar audio">
+              <span class="material-symbols-outlined">mic</span>
+            </button>
             <textarea id="demo-input" placeholder="Escribe un mensaje..." rows="1" maxlength="500"></textarea>
             <button id="demo-send" aria-label="Enviar">
               <span class="material-symbols-outlined">send</span>
@@ -493,7 +564,6 @@
   function handleUserInput(text) {
     if (!text.trim()) return;
 
-    // Direct routing for contact handoff
     if (normalize(text) === normalize('Hablar con un asesor')) {
       showAsesorView();
       return;
@@ -503,11 +573,14 @@
     const input = document.getElementById('chatbot-input');
     if (input) { input.value = ''; input.style.height = 'auto'; }
     showTyping();
+
+    // Variable delay for realism
+    const delay = 800 + Math.random() * 900;
     setTimeout(() => {
       removeTyping();
       const answer = findAnswer(text);
       addMessage('bot', answer.text, answer.replies);
-    }, 1000);
+    }, delay);
   }
 
   /* ── View switching ──────────────────────────────────────── */
@@ -515,12 +588,14 @@
     document.getElementById('chatbot-landing').style.cssText = 'display:flex; flex-direction:column;';
     document.getElementById('chatbot-chat-view').style.display    = 'none';
     document.getElementById('chatbot-asesor-view').style.display  = 'none';
+    document.getElementById('chatbot-queue-view').style.display   = 'none';
     document.getElementById('chatbot-demo-view').style.display    = 'none';
   }
 
   function showChatView() {
     document.getElementById('chatbot-landing').style.display     = 'none';
     document.getElementById('chatbot-asesor-view').style.display = 'none';
+    document.getElementById('chatbot-queue-view').style.display  = 'none';
     document.getElementById('chatbot-demo-view').style.display   = 'none';
     const chatView = document.getElementById('chatbot-chat-view');
     chatView.style.cssText = 'display:flex; flex-direction:column; height:100%;';
@@ -530,32 +605,89 @@
   function showAsesorView() {
     document.getElementById('chatbot-landing').style.display     = 'none';
     document.getElementById('chatbot-chat-view').style.display   = 'none';
+    document.getElementById('chatbot-queue-view').style.display  = 'none';
     document.getElementById('chatbot-demo-view').style.display   = 'none';
     document.getElementById('chatbot-asesor-view').style.cssText = 'display:flex; flex-direction:column; height:100%;';
-    
-    // Live Agent Status checks if local time in Bogota is within Mon-Fri 8am-6pm.
-    const now = new Date();
-    const col = new Date(now.toLocaleString('en-US', { timeZone: 'America/Bogota' }));
-    const day = col.getDay(), hr = col.getHours();
-    const online = true; // Forzado para demo: el usuario siempre ve disponibilidad inmediata
+
     const dot   = document.getElementById('live-status-dot');
     const label = document.getElementById('live-status-label');
-    if (dot)   dot.className   = 'ch-status-dot ' + (online ? 'online' : 'offline');
-    if (label) label.textContent = online ? 'En línea · Respuesta inmediata' : 'Desconectado · Fuera de horario';
+    if (dot)   dot.className   = 'ch-status-dot online';
+    if (label) label.textContent = 'En línea · Respuesta inmediata';
   }
 
-  function showDemoView() {
+  /* ── Queue (Fake) ─────────────────────────────────────────── */
+  let queueInterval = null;
+  let queueTimeout  = null;
+
+  const QUEUE_TIPS = [
+    '💡 Mientras esperas, ¿sabías que puedes consultar tu horario en el <strong>Sistema Sapio</strong>?',
+    '🎓 Tenemos <strong>más de 20 programas</strong> académicos. ¡Pregúntale a tu asesor cuál va contigo!',
+    '🌍 ¿Sabías que la Sergio tiene convenios con universidades en <strong>España, México y EE.UU.</strong>?',
+    '💰 Contamos con opciones de <strong>financiación ICETEX</strong> y Banco Sergio al 0% de interés.',
+    '📋 Ten listos tus <strong>documentos</strong>: cédula, diploma y resultados Saber 11 para agilizar el proceso.',
+  ];
+
+  function showQueueView() {
     document.getElementById('chatbot-landing').style.display     = 'none';
     document.getElementById('chatbot-chat-view').style.display   = 'none';
     document.getElementById('chatbot-asesor-view').style.display = 'none';
-    document.getElementById('chatbot-demo-view').style.cssText   = 'display:flex; flex-direction:column; height:100%;';
-    
-    const msgs = document.getElementById('demo-messages');
-    if (msgs && msgs.children.length === 0) {
-      setTimeout(() => addDemoMessage('agent', '¡Hola! Soy **Juan Carlos R.**, asesor de la Sergio. Puedo ayudarte con **negociación de becas**, revisión de documentos de admisión o agendar una cita presencial. ¿En qué puedo orientarte?'), 700);
-    }
-    setTimeout(() => { const inp = document.getElementById('demo-input'); if(inp) inp.focus(); }, 300);
+    document.getElementById('chatbot-demo-view').style.display   = 'none';
+    document.getElementById('chatbot-queue-view').style.cssText  = 'display:flex; flex-direction:column; height:100%;';
+
+    // Reset queue state
+    let position = 3;
+    let elapsed  = 0;
+    const totalWait = 12000; // 12 seconds total fake wait
+    const posEl   = document.getElementById('queue-position');
+    const waitEl  = document.getElementById('queue-wait');
+    const fillEl  = document.getElementById('queue-progress-fill');
+    const tipEl   = document.getElementById('queue-tips-text');
+
+    if (posEl)  posEl.textContent  = position;
+    if (waitEl) waitEl.textContent = '~2 min';
+    if (fillEl) fillEl.style.width = '0%';
+
+    // Rotate tips
+    let tipIdx = 0;
+    if (queueInterval) clearInterval(queueInterval);
+    queueInterval = setInterval(() => {
+      elapsed += 500;
+      const pct = Math.min((elapsed / totalWait) * 100, 100);
+      if (fillEl) fillEl.style.width = pct + '%';
+
+      // Decrement position gradually
+      if (elapsed === 3000 && posEl) { position = 2; posEl.textContent = '2'; if (waitEl) waitEl.textContent = '~1 min'; }
+      if (elapsed === 7000 && posEl) { position = 1; posEl.textContent = '1'; if (waitEl) waitEl.textContent = '~30 seg'; }
+
+      // Rotate tips every 4s
+      if (elapsed % 4000 === 0) {
+        tipIdx = (tipIdx + 1) % QUEUE_TIPS.length;
+        if (tipEl) tipEl.innerHTML = QUEUE_TIPS[tipIdx];
+      }
+
+      if (elapsed >= totalWait) {
+        clearInterval(queueInterval);
+        queueInterval = null;
+        // Transition to demo view
+        if (fillEl) fillEl.style.width = '100%';
+        queueTimeout = setTimeout(() => { showDemoView(); }, 600);
+      }
+    }, 500);
   }
+
+  function cancelQueue() {
+    if (queueInterval) { clearInterval(queueInterval); queueInterval = null; }
+    if (queueTimeout)  { clearTimeout(queueTimeout);  queueTimeout  = null; }
+  }
+
+  /* ── Audio Recording State ─────────────────────────────── */
+  let mediaRecorder  = null;
+  let audioChunks    = [];
+  let isRecording    = false;
+  let recognition    = null;
+  let lastTranscript = '';
+  let recTimerInterval = null;
+  let recSeconds     = 0;
 
   /* ── Demo Agent Chat ────────────────────────────────────── */
   const ADVISOR_REPLIES = [
@@ -573,26 +705,40 @@
     { t: ['adiós','adios','bye','hasta','chao'], r: '¡Hasta luego! Fue un placer atenderte y resolver tus inquietudes. Recuerda que puedes llamarnos al **(605) 434 6444**. ¡Éxitos!' }
   ];
 
+  // AI-style dynamic responses for demo agent (for unmatched inputs)
+  const ADVISOR_DYNAMIC = [
+    (q) => `Entiendo, gracias por compartirme eso. Cuando mencionas "${q.slice(0,30)}..." — déjame verificar la información más actualizada para ti. ¿Tienes algún programa específico en mente? Así te puedo orientar mejor. 😊`,
+    (q) => `Recibido. Sobre "${q.slice(0,30)}...", voy a consultarlo con el equipo de admisiones ahora mismo. Mientras tanto, ¿ya conoces nuestras opciones de **becas por mérito** disponibles?`,
+    () => `¡Perfecto! Ese es un punto muy importante en el proceso. Te recomiendo también visitar nuestra sede principal en **Troncal del Caribe Km 4** si puedes, o podemos coordinar una sesión virtual. ¿Cuál prefieres?`,
+    () => `Anotado. ¿Tienes ya tus **resultados Saber 11** a la mano? Eso me ayudaría a decirte exactamente a qué beneficios económicos aplicas. También podría enviarte el formulario de inscripción si ya estás decidido.`,
+    (q) => `Claro, con gusto. Lo que me describes sobre "${q.slice(0,25)}..." es algo que vemos seguido y tiene una solución sencilla. ¿Quieres que te explique el proceso paso a paso o prefieres que te llame directamente?`,
+  ];
+
   function getAdvisorReply(text) {
     const n = normalize(text);
     for (const item of ADVISOR_REPLIES) {
       if (item.t.some(t => n.includes(normalize(t)))) return item.r;
     }
-    return '¿Podrías darme más detalles sobre lo que estás buscando? De forma paralela, puedes llamarnos directamente al **(605) 434 6444**.';
+    // Dynamic AI-style fallback
+    return ADVISOR_DYNAMIC[Math.floor(Math.random() * ADVISOR_DYNAMIC.length)](text);
   }
 
-  function addDemoMessage(type, text) {
+  function addDemoMessage(type, text, isFile = false, isAudio = false) {
     const msgs = document.getElementById('demo-messages');
     if (!msgs) return;
     const row = document.createElement('div');
     row.className = `msg-row ${type}`;
-    
-    if(type === 'agent') {
+
+    if (type === 'agent') {
       row.innerHTML = `<div class="msg-avatar-sm agent-sm">JC</div><div class="msg-bubble">${formatText(text)}<span class="msg-time">${getTime()}</span></div>`;
+    } else if (isFile) {
+      row.innerHTML = `<div class="msg-bubble msg-file-bubble">${text}<span class="msg-time">${getTime()}</span></div>`;
+    } else if (isAudio) {
+      row.innerHTML = `<div class="msg-bubble msg-audio-bubble">${text}<span class="msg-time">${getTime()}</span></div>`;
     } else {
       row.innerHTML = `<div class="msg-bubble">${formatText(text)}<span class="msg-time">${getTime()}</span></div>`;
     }
-    
+
     msgs.appendChild(row);
     msgs.scrollTop = msgs.scrollHeight;
   }
@@ -619,30 +765,220 @@
     const input = document.getElementById('demo-input');
     if (input) { input.value = ''; input.style.height = 'auto'; }
     showDemoTyping();
+    const delay = 1000 + Math.random() * 1000;
     setTimeout(() => {
       removeDemoTyping();
       addDemoMessage('agent', getAdvisorReply(text));
-    }, 1200);
+    }, delay);
+  }
+
+  // File analysis responses from agent
+  const FILE_ANALYSIS_RESPONSES = [
+    (name) => `He recibido tu archivo **"${name}"** ✅. Lo estoy revisando ahora mismo. Parece estar en buen estado. ¿Es este el documento de identidad o el diploma de bachillerato?`,
+    (name) => `¡Perfecto! Recibí **"${name}"**. A primera vista se ve completo. Solo falta que me confirmes si este es el resultado Saber 11 o el formulario de solicitud.`,
+    (name) => `Documento recibido: **"${name}"** 📎. Lo adjuntaré a tu expediente de admisión. ¿Tienes algún otro documento pendiente para completar el paquete?`,
+    (name) => `Listo, **"${name}"** fue recibido correctamente ✔️. En 24 horas recibirás confirmación de que fue procesado. ¿Necesitas ayuda con algo más?`,
+  ];
+
+  const AUDIO_ANALYSIS_RESPONSES = [
+    (t) => `🎙️ Escuché tu mensaje: *"${t}"*. Déjame orientarte mejor — ¿me confirmas tu nombre y el programa que te interesa para darte info más precisa?`,
+    (t) => `🎙️ Recibí tu voz: *"${t}"*. Interesante consulta. En la **Sergio Santa Marta** tenemos respuesta para eso. ¿Quieres que te explique paso a paso?`,
+    (t) => `🎙️ Te escuché decir: *"${t}"*. Con gusto te ayudo con eso. ¿Tienes ya tus resultados Saber 11? Eso me ayudaría a decirte exactamente a qué beneficios aplicas.`,
+    (t) => `🎙️ Entendido: *"${t}"*. Es una consulta muy común. Voy a verificarlo con el equipo ahora mismo — ¿me puedes compartir tu correo para enviarte el detalle?`,
+  ];
+
+  const AUDIO_FALLBACK_RESPONSES = [
+    '🎙️ ¡Mensaje de voz recibido! Se escucha claro. ¿Sobre qué programa o proceso te puedo orientar mejor?',
+    '🎙️ ¡Audio recibido! Entiendo tu consulta. ¿Me puedes confirmar si eres aspirante nuevo o estudiante activo?',
+    '🎙️ ¡Gracias por tu mensaje de voz! Cuéntame más — ¿el tema es sobre costos, admisión o trámites académicos?',
+  ];
+
+  function getAdvisorReplyFromAudio(transcript) {
+    if (!transcript || !transcript.trim()) {
+      return AUDIO_FALLBACK_RESPONSES[Math.floor(Math.random() * AUDIO_FALLBACK_RESPONSES.length)];
+    }
+    // Try to match transcript against KB patterns first
+    const n = normalize(transcript);
+    for (const item of ADVISOR_REPLIES) {
+      if (item.t.some(t => n.includes(normalize(t)))) {
+        return `🎙️ Escuché: *"${transcript.slice(0, 60)}${transcript.length > 60 ? '...' : ''}"*\n\n${item.r}`;
+      }
+    }
+    // Dynamic response based on detected keywords
+    const fn = AUDIO_ANALYSIS_RESPONSES[Math.floor(Math.random() * AUDIO_ANALYSIS_RESPONSES.length)];
+    return fn(transcript.slice(0, 80));
+  }
+
+  function startAudioRecording() {
+    const audioBtn = document.getElementById('demo-audio-btn');
+    const recBar   = document.getElementById('demo-recording-bar');
+    const inputArea = document.getElementById('demo-input-area');
+
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        isRecording    = true;
+        audioChunks    = [];
+        lastTranscript = '';
+        recSeconds     = 0;
+
+        // UI: show recording bar, hide textarea, style mic button
+        if (recBar) recBar.style.display = 'flex';
+        const textarea = document.getElementById('demo-input');
+        if (textarea) textarea.style.display = 'none';
+        if (audioBtn) { audioBtn.classList.add('recording'); audioBtn.title = 'Detener grabación'; }
+
+        // Timer
+        const timerEl = document.getElementById('rec-timer');
+        recTimerInterval = setInterval(() => {
+          recSeconds++;
+          const m = Math.floor(recSeconds / 60);
+          const s = recSeconds % 60;
+          if (timerEl) timerEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+        }, 1000);
+
+        // SpeechRecognition for transcript
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SR) {
+          try {
+            recognition = new SR();
+            recognition.lang = 'es-CO';
+            recognition.interimResults = false;
+            recognition.continuous = true;
+            recognition.onresult = (ev) => {
+              lastTranscript = Array.from(ev.results)
+                .map(r => r[0].transcript).join(' ');
+            };
+            recognition.start();
+          } catch(e) { recognition = null; }
+        }
+
+        // MediaRecorder
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.addEventListener('dataavailable', e => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        });
+        mediaRecorder.addEventListener('stop', () => {
+          stream.getTracks().forEach(t => t.stop());
+          const blob = new Blob(audioChunks, { type: 'audio/webm' });
+          const url  = URL.createObjectURL(blob);
+          handleRecordedAudio(url, recSeconds);
+        });
+        mediaRecorder.start();
+      })
+      .catch(() => {
+        // Permission denied — show a friendly message in chat instead
+        const msgs = document.getElementById('demo-messages');
+        if (!msgs) return;
+        const row = document.createElement('div');
+        row.className = 'msg-row agent';
+        row.innerHTML = `<div class="msg-avatar-sm agent-sm">JC</div><div class="msg-bubble" style="background:#fff3cd;color:#664d03;border:1px solid #ffecb5;">Para usar el micrófono necesitas permitir el acceso. Por favor acepta el permiso del navegador e intenta de nuevo. 🎙️<span class="msg-time" style="color:#997404;">${getTime()}</span></div>`;
+        msgs.appendChild(row);
+        msgs.scrollTop = msgs.scrollHeight;
+      });
+  }
+
+  function stopAudioRecording() {
+    isRecording = false;
+    if (recTimerInterval) { clearInterval(recTimerInterval); recTimerInterval = null; }
+    if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
+    // Restore UI
+    const recBar  = document.getElementById('demo-recording-bar');
+    const audioBtn = document.getElementById('demo-audio-btn');
+    const textarea = document.getElementById('demo-input');
+    if (recBar)   recBar.style.display = 'none';
+    if (textarea) textarea.style.display = '';
+    if (audioBtn) { audioBtn.classList.remove('recording'); audioBtn.title = 'Grabar mensaje de voz'; }
+  }
+
+  function handleRecordedAudio(url, durationSec) {
+    const m = Math.floor(durationSec / 60);
+    const s = durationSec % 60;
+    const durStr = `${m}:${s.toString().padStart(2, '0')}`;
+
+    const audioHTML = `
+      <div class="demo-audio-recorded">
+        <span class="material-symbols-outlined demo-audio-icon">mic</span>
+        <div class="demo-audio-player-wrap">
+          <audio controls src="${url}" preload="metadata"></audio>
+          <span class="demo-audio-meta">Mensaje de voz &middot; ${durStr}</span>
+        </div>
+      </div>`;
+    addDemoMessage('user', audioHTML, false, true);
+
+    showDemoTyping();
+    // Give SpeechRecognition a moment to finalize
+    setTimeout(() => {
+      removeDemoTyping();
+      addDemoMessage('agent', getAdvisorReplyFromAudio(lastTranscript));
+    }, 1800 + Math.random() * 800);
+  }
+
+  function handleDemoFile(file) {
+    if (!file) return;
+    const isImage = file.type.startsWith('image/');
+    const sizeTxt = formatFileSize(file.size);
+
+    if (false) { // audio branch removed — now handled by MediaRecorder
+      void 0;
+    } else {
+      // Show file preview bubble
+      let iconName = 'description';
+      if (isImage) iconName = 'image';
+      else if (file.type === 'application/pdf') iconName = 'picture_as_pdf';
+      else if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) iconName = 'table_chart';
+
+      const fileHTML = `
+        <div class="demo-file-preview">
+          <span class="material-symbols-outlined demo-file-icon">${iconName}</span>
+          <div class="demo-file-info">
+            <span class="demo-file-name">${file.name}</span>
+            <span class="demo-file-size">${sizeTxt}</span>
+          </div>
+        </div>`;
+      addDemoMessage('user', fileHTML, true, false);
+
+      showDemoTyping();
+      setTimeout(() => {
+        removeDemoTyping();
+        const replyFn = FILE_ANALYSIS_RESPONSES[Math.floor(Math.random() * FILE_ANALYSIS_RESPONSES.length)];
+        addDemoMessage('agent', replyFn(file.name));
+      }, 2500 + Math.random() * 1000);
+    }
+  }
+
+  function showDemoView() {
+    cancelQueue();
+    document.getElementById('chatbot-landing').style.display     = 'none';
+    document.getElementById('chatbot-chat-view').style.display   = 'none';
+    document.getElementById('chatbot-asesor-view').style.display = 'none';
+    document.getElementById('chatbot-queue-view').style.display  = 'none';
+    document.getElementById('chatbot-demo-view').style.cssText   = 'display:flex; flex-direction:column; height:100%;';
+
+    const msgs = document.getElementById('demo-messages');
+    if (msgs && msgs.children.length === 0) {
+      setTimeout(() => addDemoMessage('agent', '¡Hola! Soy **Juan Carlos R.**, asesor de la Sergio. Puedo ayudarte con **negociación de becas**, revisión de documentos de admisión o agendar una cita presencial. ¿En qué puedo orientarte?'), 700);
+    }
+    setTimeout(() => { const inp = document.getElementById('demo-input'); if(inp) inp.focus(); }, 300);
   }
 
   /* ── Events ──────────────────────────────────────────────── */
   function bindEvents() {
-    const toggle = document.getElementById('chatbot-toggle');
-    const window_= document.getElementById('chatbot-window');
-    const badge  = document.getElementById('chatbot-badge');
+    const toggle  = document.getElementById('chatbot-toggle');
+    const window_ = document.getElementById('chatbot-window');
+    const badge   = document.getElementById('chatbot-badge');
 
     // Toggle open/close
     toggle.addEventListener('click', () => {
       const isOpen = window_.classList.toggle('open');
       toggle.classList.toggle('open', isOpen);
       if (badge) badge.style.display = 'none';
-      if(isOpen && document.getElementById('chatbot-landing').style.display !== 'none') {
-          // just open the landing, it's fine
-      }
     });
 
     // Minimize buttons
-    ['chat-minimize-btn', 'chat-minimize-btn-2', 'asesor-minimize-btn', 'demo-minimize-btn'].forEach(id => {
+    ['chat-minimize-btn', 'chat-minimize-btn-2', 'asesor-minimize-btn', 'queue-minimize-btn', 'demo-minimize-btn'].forEach(id => {
       const btn = document.getElementById(id);
       if (btn) {
         btn.addEventListener('click', () => {
@@ -658,6 +994,9 @@
 
     const asesorBackBtn = document.getElementById('asesor-back-btn');
     if (asesorBackBtn) asesorBackBtn.addEventListener('click', showLandingView);
+
+    const queueBackBtn = document.getElementById('queue-back-btn');
+    if (queueBackBtn) queueBackBtn.addEventListener('click', () => { cancelQueue(); showAsesorView(); });
 
     const demoBackBtn = document.getElementById('demo-back-btn');
     if (demoBackBtn) demoBackBtn.addEventListener('click', showAsesorView);
@@ -683,7 +1022,7 @@
     if (btnFaq) {
       btnFaq.addEventListener('click', () => {
         showChatView();
-        document.getElementById('chatbot-messages').innerHTML = ''; // reset chat
+        document.getElementById('chatbot-messages').innerHTML = '';
         addMessage('bot', '❓ ¡Claro! Estas son las preguntas más frecuentes. Para empezar, ¿Cuál es tu perfil?', [
           '🎓 Soy estudiante activo',
           '👨‍👩‍👧 Soy padre de familia',
@@ -692,18 +1031,54 @@
       });
     }
 
-    // Asesor channel bindings
+    // Asesor channel bindings — now goes to queue first
     const channelLive = document.getElementById('channel-live-chat');
-    if (channelLive) channelLive.addEventListener('click', showDemoView);
+    if (channelLive) channelLive.addEventListener('click', showQueueView);
 
     const channelSched = document.getElementById('channel-schedule');
     if (channelSched) channelSched.addEventListener('click', () => {
       alert('Próximamente: Agendamiento online en vivo. Por favor llámanos al (605) 434 6444.');
     });
 
-    // Topic chips
+    // Topic chips — drag-to-scroll on desktop
+    const topicsEl = document.getElementById('chatbot-topics');
+    if (topicsEl) {
+      let isDragging = false;
+      let startX = 0;
+      let scrollLeft = 0;
+
+      topicsEl.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.pageX - topicsEl.offsetLeft;
+        scrollLeft = topicsEl.scrollLeft;
+        topicsEl.style.cursor = 'grabbing';
+        topicsEl.style.userSelect = 'none';
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - topicsEl.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        topicsEl.scrollLeft = scrollLeft - walk;
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        topicsEl.style.cursor = 'grab';
+        topicsEl.style.userSelect = '';
+      });
+
+      topicsEl.style.cursor = 'grab';
+    }
+
     document.querySelectorAll('.topic-chip').forEach(chip => {
-      chip.addEventListener('click', () => handleUserInput(chip.dataset.topic));
+      chip.addEventListener('click', (e) => {
+        // Don't fire if was a drag
+        if (topicsEl && Math.abs(topicsEl.scrollLeft - (parseInt(topicsEl.dataset.scrollStart) || 0)) > 5) return;
+        handleUserInput(chip.dataset.topic);
+      });
     });
 
     // SEND Input (Bot)
@@ -722,6 +1097,31 @@
     if(demoInputEl) {
       demoInputEl.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleDemoInput(demoInputEl.value.trim()); } });
       demoInputEl.addEventListener('input', () => { demoInputEl.style.height = 'auto'; demoInputEl.style.height = Math.min(demoInputEl.scrollHeight, 100) + 'px'; });
+    }
+
+    // File attachment (Demo)
+    const attachBtn  = document.getElementById('demo-attach-btn');
+    const fileInput  = document.getElementById('demo-file-input');
+    if (attachBtn && fileInput) {
+      attachBtn.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files && fileInput.files[0]) {
+          handleDemoFile(fileInput.files[0]);
+          fileInput.value = '';
+        }
+      });
+    }
+
+    // Audio recording (Demo) — real MediaRecorder + SpeechRecognition
+    const audioBtn = document.getElementById('demo-audio-btn');
+    if (audioBtn) {
+      audioBtn.addEventListener('click', () => {
+        if (!isRecording) {
+          startAudioRecording();
+        } else {
+          stopAudioRecording();
+        }
+      });
     }
   }
 
