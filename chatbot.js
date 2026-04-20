@@ -93,8 +93,8 @@
       replies: ['Sede principal', 'Hablar con un asesor']
     },
     {
-      patterns: ['calendario', 'calendario academico', 'calendario académico'],
-      response: '📅 El **Calendario Académico** establece las fechas de inicio de clases, parciales y cierres de notas.\n\nPuedes descargarlo actualizado directamente desde nuestro sitio web o solicitar acompañamiento puntual.',
+      patterns: ['calendario', 'calendario academico', 'calendario académico', 'cuando empiezan las clases', 'cuando son los parciales'],
+      response: '📅 El **Calendario Académico** establece las fechas de inicio de clases, parciales y cierres de notas.\n\nPuedes descargarlo actualizado directamente desde nuestro sitio web o solicitar acompañamiento puntual en secretaría.',
       replies: ['Hablar con un asesor']
     },
     {
@@ -103,8 +103,28 @@
       replies: ['Horario de atención', 'Contacto']
     },
     {
-      patterns: ['estudiante activo', 'soy estudiante', 'mis horarios', 'ver notas', 'ver mis notas', 'certificado', 'portal estudiantil'],
+      patterns: ['estudiante activo', 'soy estudiante', 'certificado', 'portal estudiantil'],
       response: '🎓 Como **Estudiante Activo**, tus plataformas principales son:\n\n• **Sistema Sapio:** Para consultar notas y matrícula.\n• **Portal Estudiantil:** Para descargar certificados sabanillas de pago.\n• **Moodle:** Para las aulas virtuales.\n\n¿De cuál sistema necesitas información o acceso?',
+      replies: ['Hablar con un asesor']
+    },
+    {
+      patterns: ['donde puedo ver mis notas', 'como consulto mi promedio', 'ver notas', 'ver mis notas'],
+      response: '📊 Tus **calificaciones** y promedio académico están disponibles en el **Sistema Sapio**.\n\nSi necesitas un certificado oficial, sábana de notas o consolidado histórico, puedes generarlo desde tu Portal Estudiantil.',
+      replies: ['Hablar con un asesor']
+    },
+    {
+      patterns: ['cual es mi horario', 'que materias tengo este semestre', 'mi horario', 'mis horarios', 'horario de clases'],
+      response: '🕒 Para consultar tu **horario de clases** y las materias inscritas, debes ingresar al **Sistema Sapio** con tu usuario y contraseña.\n\n*(Si acabas de realizar tu matrícula, recuerda que puede tardar hasta 48 horas en reflejarse en el sistema).*',
+      replies: ['Hablar con un asesor']
+    },
+    {
+      patterns: ['como puedo inscribirme a clases de ingles', 'clases de ingles', 'instituto de idiomas', 'aprender ingles', 'clases de inglés'],
+      response: '🇺🇸 **Centro de Idiomas:**\n\nPara tomar las clases de inglés, debes dirigirte al Centro de Idiomas de la universidad y realizar tu proceso de nivelación o inscripción. Recuerda que certificar un segundo idioma es un requisito de grado.',
+      replies: ['Hablar con un asesor']
+    },
+    {
+      patterns: ['que clases tiene diseño digital', 'que clases tiene diseño', 'cuantos semestres dura psicologia', 'cuantos semestres dura psicología', 'plan de estudios', 'malla curricular', 'semestres dura'],
+      response: '📚 **Información Curricular:**\n\nNuestros pregrados profesionales (como Diseño Digital, Derecho o Psicología) suelen tener una duración de **8 a 10 semestres**.\n\nPuedes consultar el plan de estudios exacto y las materias a cursar en el sitio web de la universidad (Sección Programas) o mediante nuestros asesores.',
       replies: ['Hablar con un asesor']
     },
     {
@@ -113,7 +133,7 @@
       replies: ['Hablar con un asesor']
     },
     {
-      patterns: ['internacionalizacion', 'internacionalización', 'intercambio', 'viajar'],
+      patterns: ['internacionalizacion', 'internacionalización', 'intercambio', 'viajar', 'como puedo ver los convenios internacionales', 'convenios internacionales'],
       response: '🌍 Nuestro departamento de **Internacionalización** (ORI) te permite cursar semestres en el exterior, participar en escuelas de verano y aplicar a becas internacionales como Alianza del Pacífico.\n\nContamos con convenios en España, México, EE.UU. y más.',
       replies: ['Hablar con un asesor']
     },
